@@ -99,7 +99,7 @@ const Crow = () => {
   const [error, setError] = React.useState('false');
   const [image,setImage] = React.useState('');
   const [downloadUri, setDownloadUri] = React.useState('');
-  const uploadImages=async(image)=>{
+  const uploadImages=(image)=>{
     const storageRef  =  storage.ref(`images/${image.name}`);
     let self = this;
     return new Promise((resolve, reject) => {
