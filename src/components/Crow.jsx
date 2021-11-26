@@ -122,7 +122,7 @@ const Crow = () => {
     });
 }
 const checkFieldsEmpty = () => {
-  if(!image|| !postData.name ||  !postData.Committe1 || !postData.email || !postData.phone || !postData.academicYear || !postData.college){
+  if(!image|| !postData.name ||  !commit2 || !postData.email || !postData.phone || !postData.academicYear || !postData.college || !postData.position){
     return false;
   }
   return true;
@@ -132,34 +132,39 @@ const handleChangeImage = event=>{
   if(event.target.files[0]){
       setImage(event.target.files[0]);
     }
- 
- 
 }
       const submitReqr=async()=>{
-        setLoading(true);
-      
+        if(checkFieldsEmpty()){
+          setLoading(true);
+          uploadImages(image).then(async function(v) {
+            console.log("dow",v); // 1
+            const { data, error } = await supabase
+            .from('crow')
+            .insert([
+              { name: postData.name, phone: postData.phone, mail:postData.email,  Committee:commit2, department: department,year:postData.academicYear,college:postData.college,  img: v, position: postData.position }
+            ])
+            console.log("error", error);
+            if(data) {
+              setPostData({...postData,  name: '', phone: '',email:'', Committe1: '', Committe2: '', academicYear:'',college:'' })
+              setPersonName('')
+              setCommit2('')
+              setDepartment('')
+             
+              setSuccess(true)
+              document.getElementById("client").reset();
+              setLoading(false);
+            }
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+        }else{
+          alert("Please fill all the fields");
+        }
+     
+
         let downURL = '';
-        console.log(  uploadImages(image).then(async function(v) {
-          console.log("dow",v); // 1
-          downURL = v;
-          const { data, error } = await supabase
-          .from('crow')
-          .insert([
-            { name: postData.name, phone: postData.phone, mail:postData.email,  Committee:commit2, department: department,year:postData.academicYear,college:postData.college,  img: v, position: postData.position }
-          ])
-          console.log("error", error);
-          if(data) {
-            setPostData({...postData,  name: '', phone: '',email:'', Committe1: '', Committe2: '', academicYear:'',college:'' })
-            setPersonName('')
-            setCommit2('')
-            setDepartment('')
-           
-            setSuccess(true)
-            document.getElementById("client").reset();
-            setLoading(false);
-          }
-        })
-        );
+     
       }
     return (
         <>
@@ -170,7 +175,7 @@ const handleChangeImage = event=>{
                 <img src="/MSP FULL LOGO White.png" className="logo_image"/>
 
                     <form name="login" className="form" id="client" >
-                        <h1 className="text-center main-h1">Recruitment Form</h1>
+                        <h1 className="text-center main-h1" style={{color:'rgba(255, 255, 255, 0.7)'}}>Recruitment Form</h1>
                     <Divider>Personal Data</Divider>
                         <div className="input-control perso">
                        
