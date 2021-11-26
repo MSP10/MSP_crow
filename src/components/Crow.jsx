@@ -6,8 +6,6 @@ import "../form.css"
 import "../main.css"
 import {storage} from '../firebase/index'
 import {supabase} from '../client.js'
-import DataBicker from './DataBicker'
-import MultipleSelectCheckmarks from './List'
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -17,6 +15,7 @@ import Select from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
+import { v4 as uuidv4 } from 'uuid';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -100,26 +99,28 @@ const Crow = () => {
   const [success, setSuccess] = React.useState(false);
   const [error, setError] = React.useState('false');
   const [image,setImage] = React.useState('');
-
-  const upload_image = (image) => {
-        
-    const storageRef = storage().ref(`images/${image.name}`);
-    const task = storageRef.put(image);
-    task.on('state_changed',
-        (snapshot) => {
-            let percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+  const [downloadUri, setDownloadUri] = React.useState('');
+  const uploadImages=async(image)=>{
+    const storageRef  =  storage.ref(`images/${image.name}`);
+    let self = this;
+    return new Promise((resolve, reject) => {
+      let imageName = uuidv4();
+      let fileExt = image.name.split(".").pop();
+      let uploadTask =  storageRef.put(image);
+      uploadTask.on("state_changed", {
+        error: error => {
+          console.error(error);
+          reject(error);
         },
-        (error) => {
-            console.log(error.message);
-        },
-        () => {
-            task.snapshot.ref.getDownloadURL().then(downloadURL => {
-                console.log('File available at', downloadURL);
-                //add image url to firebase database
-            });
+        complete: () => {
+          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+            setDownloadUri(downloadURL);
+            console.log(downloadURL);
+            resolve(downloadURL);
+          });
         }
-    );
-
+      });
+    });
 }
 const checkFieldsEmpty = () => {
   if(!image|| !postData.name || !postData.Committe2 || !postData.Committe1 || !postData.email || !postData.phone || !postData.academicYear || !postData.college){
@@ -127,11 +128,23 @@ const checkFieldsEmpty = () => {
   }
   return true;
 }
-
+const handleChangeImage = event=>{
+  event.preventDefault();
+  if(event.target.files[0]){
+      setImage(event.target.files[0]);
+    }
+ 
+ 
+}
       const submitReqr=async()=>{
         setLoading(true);
+        console.log(  uploadImages(image).then(function(v) {
+          console.log("dow",v); // 1
+        })
+        );
+        console.log("download URL=> ",downloadUri);
         const { data, error } = await supabase
-        .from('reqr')
+        .from('')
         .insert([
           { name: postData.name, phone: postData.phone, email:postData.email, Committe1: personName, Committe2:commit2, department: department,academicYear:postData.academicYear,college:postData.college}
         ])
@@ -170,8 +183,10 @@ const checkFieldsEmpty = () => {
                    
                         <div className="input-control">
                   <TextField variant="outlined" type="email" style={{width: '100% !important'}} label="Email*" onChange={(e) => setPostData({ ...postData, email: e.target.value })}/>
-                            
-        
+                        </div>
+                        <div className="input-control" style={{display:'flex', flexDirection:'column', alignItems:'flex-start'}}>
+                        <label style={{marginBottom:'10px', color:'rgba(255, 255, 255, 0.7)'}}>Personal Image</label>
+                        <input className="data-upload" type="file" accept="image/*" onChange = {handleChangeImage} style={{color:'rgba(255, 255, 255, 0.7)'}} />
                         </div>
                     <Divider>Community Data</Divider>
 
