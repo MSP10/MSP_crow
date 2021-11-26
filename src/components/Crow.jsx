@@ -54,8 +54,7 @@ const Crow = () => {
     const [personName, setPersonName] = React.useState('');
     const [commit2, setCommit2] = React.useState('');
     const [department, setDepartment] = React.useState('');
-
-
+    const [status, setStatus] = React.useState(false);
     const handleChange = (event) => {
       const {
         target: { value },
@@ -94,7 +93,7 @@ const Crow = () => {
           }),
         [mode],
       );
-  const [postData, setPostData] = React.useState({ name: '', phone: '',email:'', Committe1: '', Committe2: '', academicYear:'',college:'' });
+  const [postData, setPostData] = React.useState({ name: '', phone: '',email:'', Committe1: '', Committe2: '', academicYear:'',college:'', position:'' });
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
   const [error, setError] = React.useState('false');
@@ -123,7 +122,7 @@ const Crow = () => {
     });
 }
 const checkFieldsEmpty = () => {
-  if(!image|| !postData.name || !postData.Committe2 || !postData.Committe1 || !postData.email || !postData.phone || !postData.academicYear || !postData.college){
+  if(!image|| !postData.name ||  !postData.Committe1 || !postData.email || !postData.phone || !postData.academicYear || !postData.college){
     return false;
   }
   return true;
@@ -138,26 +137,29 @@ const handleChangeImage = event=>{
 }
       const submitReqr=async()=>{
         setLoading(true);
-        console.log(  uploadImages(image).then(function(v) {
+      
+        let downURL = '';
+        console.log(  uploadImages(image).then(async function(v) {
           console.log("dow",v); // 1
+          downURL = v;
+          const { data, error } = await supabase
+          .from('crow')
+          .insert([
+            { name: postData.name, phone: postData.phone, mail:postData.email,  Committee:commit2, department: department,year:postData.academicYear,college:postData.college,  img: v, position: postData.position }
+          ])
+          console.log("error", error);
+          if(data) {
+            setPostData({...postData,  name: '', phone: '',email:'', Committe1: '', Committe2: '', academicYear:'',college:'' })
+            setPersonName('')
+            setCommit2('')
+            setDepartment('')
+           
+            setSuccess(true)
+            document.getElementById("client").reset();
+            setLoading(false);
+          }
         })
         );
-        console.log("download URL=> ",downloadUri);
-        const { data, error } = await supabase
-        .from('')
-        .insert([
-          { name: postData.name, phone: postData.phone, email:postData.email, Committe1: personName, Committe2:commit2, department: department,academicYear:postData.academicYear,college:postData.college}
-        ])
-        if(data) {
-          setPostData({...postData,  name: '', phone: '',email:'', Committe1: '', Committe2: '', academicYear:'',college:'' })
-          setPersonName('')
-          setCommit2('')
-          setDepartment('')
-          setLoading(false);
-          setSuccess(true)
-          document.getElementById("client").reset();
-        }
-        console.log(error)
       }
     return (
         <>
@@ -190,36 +192,14 @@ const handleChangeImage = event=>{
                         </div>
                     <Divider>Community Data</Divider>
 
+                      <div className="input-control">
+                  <TextField variant="outlined" type="text" style={{width: '100% !important'}} label="Position*" onChange={(e) => setPostData({ ...postData, position: e.target.value })}/>
+                      
+                      </div>
                         <div className="input-control">
                        
                         <FormControl sx={{ m: 1, width: 300 }}>
-                        <InputLabel id="Committe1-multiple-checkbox-label">Committe1*</InputLabel>
-                        <Select
-                        labelId="Committe1-multiple-checkbox-label"
-                        id="demo-multiple-checkbox"
-                        
-                        value={personName}
-                        onChange={handleChange}
-                        input={<OutlinedInput label="Committe1*" />}
-                        renderValue={(selected) => selected.join(', ')}
-                        MenuProps={MenuProps}
-                        
-                        >
-                        {commit.map((name) => (
-                            <MenuItem key={name} value={name}>
-                            <Checkbox checked={personName.indexOf(name) > -1} />
-                            <ListItemText primary={name} />
-                            </MenuItem>
-                        ))}
-                        </Select>
-                    </FormControl>
-                        
-        
-                        </div>
-                        <div className="input-control">
-                       
-                        <FormControl sx={{ m: 1, width: 300 }}>
-                        <InputLabel id="Committe2-multiple-checkbox-label">Committe2*</InputLabel>
+                        <InputLabel id="Committe2-multiple-checkbox-label">Committe</InputLabel>
                         <Select
                         labelId="Committe2-multiple-checkbox-label"
                         id="Committe2-multiple-checkbox"
