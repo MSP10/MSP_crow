@@ -38,6 +38,7 @@ const names = [
     'other',
  ];
  const commit = [
+    'highboard',
     'Hr',
     'Pr&Lr',
     'Media and graphic',
@@ -175,7 +176,7 @@ const handleChangeImage = event=>{
                 <img src="/MSP FULL LOGO White.png" className="logo_image"/>
 
                     <form name="login" className="form" id="client" >
-                        <h1 className="text-center main-h1" style={{color:'rgba(255, 255, 255, 0.7)'}}>Recruitment Form</h1>
+                        <h1 className="text-center main-h1" style={{color:'rgba(255, 255, 255, 0.7)'}}>Crew Form</h1>
                     <Divider>Personal Data</Divider>
                         <div className="input-control perso">
                        
