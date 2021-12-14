@@ -123,7 +123,7 @@ const Crow = () => {
     });
 }
 const checkFieldsEmpty = () => {
-  if(!image|| !postData.name ||  !commit2 || !postData.email || !postData.phone || !postData.academicYear || !postData.college || !postData.position){
+  if(!postData.name ||  !commit2 || !postData.email || !postData.phone || !postData.academicYear || !postData.college || !postData.position){
     return false;
   }
   return true;
